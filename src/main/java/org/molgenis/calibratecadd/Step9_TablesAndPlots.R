@@ -2,7 +2,7 @@
 # Performance benchmark result processing and plotting
 ######################################################
 
-version <- "r0.2"
+version <- "r0.3"
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
 
 library(ggplot2)
@@ -83,7 +83,7 @@ sd(calibrations$MeanDifference, na.rm = T)
 table(calibrations$Category)
 
 # Some plots/stats on the variants used in calibration
-variants <- read.table(paste(pathToGavinGitRepo,"/data/other/clinvar_exac_calibrationvariants_",version,".tsv",sep=""), sep="\t", header=T)
+variants <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/clinvar_exac_calibrationvariants_",version,".tsv.gz",sep="")), sep="\t", header=T)
 ggplot() +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=14,face="bold")) +
   geom_jitter(data = variants, aes(x = cadd, y = effect, colour = group, alpha=group), stroke = 2, size=2, position = position_jitter(width = .5, height=.5)) +
@@ -115,7 +115,7 @@ ggplot() +
     xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
     theme(legend.position = "none")
   p
-  #ggsave(paste("/Users/jvelde/Desktop/gavin/website/plots/",selectGene,".png", sep=""), width=8, height=4.5)
+  #ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3",selectGene,".png", sep=""), width=8, height=4.5)
 #}
 
 ###################################################
