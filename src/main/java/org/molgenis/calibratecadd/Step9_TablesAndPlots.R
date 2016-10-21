@@ -90,39 +90,55 @@ ggplot() +
   scale_colour_manual(values=c(vermillion, skyblue)) +
   scale_alpha_discrete(range = c(.75, .25))
 
+# load rule guide
+rules <- read.table(paste(pathToGavinGitRepo,"/data/predictions/GAVIN_ruleguide_",version,".tsv",sep=""),header=TRUE,sep='\t',quote="",comment.char="",as.is=TRUE, skip=33)
+rules$PathogenicIfCADDScoreGreaterThan <- as.numeric(rules$PathogenicIfCADDScoreGreaterThan)
+rules$BenignIfCADDScoreLessThan <- as.numeric(rules$BenignIfCADDScoreLessThan)
+
+
 ## Gene plots, for single selected genes or all genes in a for-loop
-#for (selectGene in unique(variants$gene)) {
-  selectGene <- "RYR2"
-  variants.selectedGene.path <- subset(variants, gene == selectGene & group == "PATHOGENIC")
-  variants.selectedGene.popul <- subset(variants, gene == selectGene & group == "POPULATION")
-  calibrations.selectedGene <- subset(calibrations, Gene == selectGene)
-  p <- ggplot() +
-    geom_point(data = variants.selectedGene.popul, aes(x=pos, y=cadd), colour="blue", pch=19, alpha = .5) +
-    geom_point(data = variants.selectedGene.path, aes(x=pos, y=cadd), colour="red", pch=19, alpha = .5) +
-    geom_abline(intercept = calibrations.selectedGene$MeanPopulationCADDScore, slope = 0, colour = "blue", size = 2, alpha = .5) +
-    geom_abline(intercept = calibrations.selectedGene$MeanPathogenicCADDScore, slope = 0, colour = "red", size = 2, alpha = .5) +
-    geom_abline(intercept = calibrations.selectedGene$Sens95thPerCADDThreshold, slope = 0, colour = "green", size = 2, alpha = .5) +
-    geom_abline(intercept = calibrations.selectedGene$Spec95thPerCADDThreshold, slope = 0, colour = "orange", size = 2, alpha = .5) +
-    theme_bw() +
-    theme(axis.line = element_line(colour = "black"),
-          panel.grid.major = element_line(colour = "black"),
-          panel.grid.minor = element_line(colour = "gray"),
-          panel.border = element_blank(),
-          panel.background = element_blank()
-    ) +
-    labs(title=paste(selectGene, " - pathogenic mean: ", calibrations.selectedGene$MeanPathogenicCADDScore, ", population mean: ", calibrations.selectedGene$MeanPopulationCADDScore, ", p-value: ", signif(as.numeric(calibrations.selectedGene$UTestPvalue), digits=2), "\n95% sensitivity threshold (green): ", calibrations.selectedGene$Sens95thPerCADDThreshold, ", 95% specificity threshold (orange): ", calibrations.selectedGene$Spec95thPerCADDThreshold, "\nRed: ClinVar pathogenic variants - Blue: matched ExAC population variants", sep="")) +
-    ylab("CADD scaled C-score") +
-    xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
-    theme(legend.position = "none")
-  p
-  #ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3",selectGene,".png", sep=""), width=8, height=4.5)
-#}
+for (selectGene in unique(variants$gene)) {
+  #selectGene <- "MYH7"
+  rules.selectedGene <- subset(rules, Gene == selectGene)
+  if(startsWith(rules.selectedGene$CalibrationCategory, "C")) {
+    variants.selectedGene.path <- subset(variants, gene == selectGene & group == "PATHOGENIC")
+    variants.selectedGene.popul <- subset(variants, gene == selectGene & group == "POPULATION")
+    p <- ggplot() +
+      geom_point(data = variants.selectedGene.popul, aes(x=pos, y=cadd), colour="blue", pch=19, alpha = .5) +
+      geom_point(data = variants.selectedGene.path, aes(x=pos, y=cadd), colour="red", pch=19, alpha = .5) +
+      geom_abline(intercept = rules.selectedGene$BenignIfCADDScoreLessThan, slope = 0, colour = "blue", size = 2, alpha = .5) +
+      geom_abline(intercept = rules.selectedGene$PathogenicIfCADDScoreGreaterThan, slope = 0, colour = "red", size = 2, alpha = .5) +
+      theme_bw() +
+      theme(axis.line = element_line(colour = "black"),
+            panel.grid.major = element_line(colour = "black"),
+            panel.grid.minor = element_line(colour = "gray"),
+            panel.border = element_blank(),
+            panel.background = element_blank()
+      ) +
+      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
+      ylab("CADD scaled C-score") +
+      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
+      theme(legend.position = "none")
+  } else {
+    p <- ggplot() +
+      geom_text(aes(label = paste("There is no variant CADD calibration for ", selectGene, ".\nHowever, estimated impact or allele frequency may\nbe predictive. Please consult the GAVIN rule guide.", sep=""), x = .5, y = .75)) +
+      theme_bw() +
+      theme(axis.line = element_line(colour = "white"), panel.grid.major = element_line(colour = "white"), panel.grid.minor = element_line(colour = "white"), panel.border = element_blank(), panel.background = element_blank()) +
+      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
+      ylab("CADD scaled C-score") +
+      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
+      theme(legend.position = "none") +
+      xlim(0,1) + ylim(0,1)
+  }
+  #p
+  ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3/",selectGene,".png", sep=""), width=8, height=4.5)
+}
 
 ###################################################
 # Bootstrap analysis result processing and plotting
 ###################################################
 
-bootStrapResults <- paste(pathToGavinGitRepo,"/data/other/performancebootstrap_output_usedinpaper_",version,".r",sep="")
+bootStrapResults <- paste(pathToGavinGitRepo,"/data/other/performancebootstrap_output_usedinpaper_",version,".R",sep="")
 df <- read.table(bootStrapResults,header=TRUE)
 df$Acc <- as.double(as.character(df$Acc))
 
