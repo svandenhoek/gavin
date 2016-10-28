@@ -2,7 +2,7 @@
 # Performance benchmark result processing and plotting
 ######################################################
 
-version <- "r0.3"
+version <- "r0.2"
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
 
 library(ggplot2)
