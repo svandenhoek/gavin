@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import org.molgenis.calibratecadd.support.LoadCADDWebserviceOutput;
+import org.molgenis.data.vcf.utils.FixVcfAlleleNotation;
 
 /**
  * Example usage:
@@ -86,7 +87,7 @@ public class Step6_PrepForAnalysis
 			}
 			else
 			{
-				String trimmedRefAlt = LoadCADDWebserviceOutput.trimRefAlt(ref, alt, "_");
+				String trimmedRefAlt = FixVcfAlleleNotation.trimRefAlt(ref, alt, "_");
 				key = chr + "_" + pos + "_" + trimmedRefAlt;
 				if(caddScores.containsKey(key))
 				{
