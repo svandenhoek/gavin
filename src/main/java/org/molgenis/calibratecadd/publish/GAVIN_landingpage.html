@@ -13,33 +13,30 @@
 					</div>
 					<div class="row">
 						<div class="col-md-12 col-md-offset-0 text-center">
-							<h2>GAVIN (r0.1)</h2>
+							<h2>GAVIN (r0.3)</h2>
 							<h3>Gene-Aware Variant INterpretation</h3>
 							<br>
 							<font color="red" size="2"><b>Please note:</b> indels are not yet automatically annotated with CADD scores.<br>For best results, pre-annotate these using VCF INFO field "CADD_SCALED=12.34".</font><br>
-							<font color="red" size="2"><b>Website updates coming soon:</b> migration to r0.3 (up from r0.1), minor tool<br>fixes, updated gene table and calibration plots.</font><br>
 							<br>
 							<a href="/menu/main/gavin-app"><b>Upload a VCF (GRCh37, max. 150MB) to classify variants</b></a><br>
-							(see example <a href="https://molgenis26.gcc.rug.nl/downloads/gavin/variantclassificationwebtool/examplevcf/gavin_input_example.vcf">input</a> file and matching <a href="https://molgenis26.gcc.rug.nl/downloads/gavin/variantclassificationwebtool/examplevcf/gavin_output_example.vcf">output</a> with 4 benign and 4 pathogenic variants)<br>
-							<i>approximately 10 variants per second are processed</i><br>
+							See example <a href="https://molgenis26.gcc.rug.nl/downloads/gavin/variantclassificationwebtool/examplevcf/gavin_input_example.vcf">input</a> file and matching <a href="https://molgenis26.gcc.rug.nl/downloads/gavin/variantclassificationwebtool/examplevcf/gavin_output_example.vcf">output</a> with 4 benign and 4 pathogenic variants.<br>
+							(approximately 10 variants per second are processed)<br>
 							<br>
-							<i>or</i><br>
+							<i>- or -</i><br>
 							<br>
-							<a href="https://github.com/joerivandervelde/gavin/blob/master/data/predictions/GAVIN_ruleguide_r0.3.tsv"><b>Browse latest gene guide (r0.3)</b></a><br>
-							<!--
-							<a href="/menu/main/dataexplorer?entity=gavin"><b>Browse raw gene calibrations</b></a><br>
-							<i>These calibrations are used internally and are not optimized for sensitivity in their native form.</i-->
+							<b>Browse latest gene guide and plots (r0.3, <a href="https://github.com/joerivandervelde/gavin/blob/master/data/predictions/GAVIN_ruleguide_r0.3.tsv">download as tab-separated file</a>)</b></a><br>
+
 						</div>
 					</div>
-					<!--div class="row">
+					<div class="row">
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<div class="input-group"><input id="direct-repository-query" class="form-control" type="text" placeholder="Search for a gene, position, category, etc" /> <span class="input-group-btn"> <button id="direct-repository-query-button" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search">&nbsp;</span></button></span></div>
-							Examples: <a href="/menu/main/dataexplorer?entity=gavin&query[q][0][operator]=SEARCH&query[q][0][value]=TTN">TTN</a>,
-							<a href="/menu/main/dataexplorer?entity=gavin&query[q][0][operator]=SEARCH&query[q][0][value]=MYH7">MYH7</a>,
-							<a href="/menu/main/dataexplorer?entity=gavin&query[q][0][operator]=SEARCH&query[q][0][value]=RYR2">RYR2</a>.
-							Click the <img src="https://molgenis26.target.rug.nl/ccgg_resources/res/react_search_icon.png"/> icon to bring up the detailed view per gene.
+							<div class="input-group"><input id="direct-repository-query" class="form-control" type="text" placeholder="Search for a gene name" /> <span class="input-group-btn"> <button id="direct-repository-query-button" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search">&nbsp;</span></button></span></div>
+							Examples: <a href="/menu/main/dataexplorer?entity=gavin_ruleguide&query[q][0][operator]=SEARCH&query[q][0][value]=TTN">TTN</a>,
+							<a href="/menu/main/dataexplorer?entity=gavin_ruleguide&query[q][0][operator]=SEARCH&query[q][0][value]=MYH7">MYH7</a>,
+							<a href="/menu/main/dataexplorer?entity=gavin_ruleguide&query[q][0][operator]=SEARCH&query[q][0][value]=RYR2">RYR2</a>.
+							Click the <img src="https://molgenis26.target.rug.nl/ccgg_resources/res/react_search_icon.png"/> icon to bring up the gene plot.
 						</div>
-					</div-->
+					</div>
 				</div>
 
 				<div class="row">
@@ -62,7 +59,7 @@
 						});
 						$("#direct-repository-query-button").on('click', function(){
 							var queryValue = $("#direct-repository-query").val();
-							window.location= "/menu/main/dataexplorer?entity=gavin&hideselect=true&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D="+queryValue;
+							window.location= "/menu/main/dataexplorer?entity=gavin_ruleguide&hideselect=true&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D="+queryValue;
 						});
 					});
 
