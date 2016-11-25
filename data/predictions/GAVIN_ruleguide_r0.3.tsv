@@ -10,7 +10,7 @@
 ## Genome-wide rules are used if the gene-specific rules fail to classify.
 ## These rules are applied as follows:
 ## 1) If impact equals MODIFIER -> benign,
-## 2) if MAF greater than 0.004264361 -> benign,
+## 2) if MAF greater than 0.003456145 -> benign,
 ## 3) if CADD greater than 15 -> pathogenic,
 ## 4) if CADD less than 15 -> benign.
 ## 
