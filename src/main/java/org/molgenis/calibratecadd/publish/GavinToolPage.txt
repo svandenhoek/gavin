@@ -2,7 +2,7 @@
 <h1>Please upload a VCF file (GRCh37/hg19) containing up to 100,000 variants</h1>
 
 <p>
-Please provide a <a href="http://vcftools.sourceforge.net/specs.html">VCF file</a> of your variants. This web service follows the input rules of the <a href="http://cadd.gs.washington.edu/score">CADD service</a>, meaning that it is sufficient to provide the first 5 columns of a (gzipped) VCF file. All other information than CHROM, POS, REF, ALT will be ignored, as is the header (or any line starting with #). Files may be up to 3MB, and up to 100,000 can be processed per submission. Use file extension .vcf, .vcf.gz, .tsv or .tsv.gz.
+Please provide a <a href="http://vcftools.sourceforge.net/specs.html">VCF file</a> of your variants. This web service follows the input rules of the <a href="http://cadd.gs.washington.edu/score">CADD service</a>, meaning that it is sufficient to provide the first 5 columns of a (gzipped) VCF file. All other information than CHROM, POS, REF, ALT will be ignored, as is the header (or any line starting with #). Files may be up to 3MB, and up to 100,000 variants can be processed per submission. Use file extension .vcf, .vcf.gz, .tsv or .tsv.gz with UTF-8/ASCII encoding.
 </p>
 
 <p>
