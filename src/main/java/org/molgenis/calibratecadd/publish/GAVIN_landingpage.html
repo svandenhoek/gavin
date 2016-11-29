@@ -16,7 +16,7 @@
 							<h2>GAVIN (r0.3)</h2>
 							<h3>Gene-Aware Variant INterpretation</h3>
 							<br>
-							<a href="/menu/main/gavin-app"><b>Upload file to classify variants</b></a><br>
+							<a class="btn btn-primary" href="/menu/main/gavin-app"><b>Upload file to classify variants</b></a><br>
 							<br>
 							<i>- or -</i><br>
 							<br>
@@ -55,7 +55,7 @@
 						});
 						$("#direct-repository-query-button").on('click', function(){
 							var queryValue = $("#direct-repository-query").val();
-							window.location= "/menu/main/dataexplorer?entity=gavin_ruleguide&hideselect=true&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D="+queryValue;
+							window.location= "/menu/main/dataexplorer?entity=GavinCalibrations&hideselect=true&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D="+queryValue;
 						});
 					});
 

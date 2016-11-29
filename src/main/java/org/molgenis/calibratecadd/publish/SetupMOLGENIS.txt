@@ -35,5 +35,7 @@ Give the anonymous user EDIT permissions on the Gavin plugin
 Give anonymous user EDIT permissions on GavinJobExecution plugin
 Configure annotation resources
 
+7) go directly to gavin table and hide the dropdown:
+'entity=GavinCalibrations&hideselect=true' in Menu Manager saven
 
-
+8) change name of DataExplorer menu item to 'Calibrations'
