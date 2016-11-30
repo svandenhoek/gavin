@@ -2,15 +2,15 @@
 <h1>Please upload a VCF file (GRCh37/hg19) containing up to 100,000 variants</h1>
 
 <p>
-Please provide a <a href="http://vcftools.sourceforge.net/specs.html">VCF file</a> of your variants. This web service follows the input rules of the <a href="http://cadd.gs.washington.edu/score">CADD service</a>, meaning that it is sufficient to provide the first 5 columns of a (gzipped) VCF file. All other information than CHROM, POS, REF, ALT will be ignored, as is the header (or any line starting with #). Files may be up to 3MB, and up to 100,000 variants can be processed per submission. Use file extension .vcf, .vcf.gz, .tsv or .tsv.gz with UTF-8/ASCII encoding.
+Please provide a <a href="http://vcftools.sourceforge.net/specs.html">VCF file</a> of your variants. This web service follows the input rules of the <a href="http://cadd.gs.washington.edu/score">CADD service</a>, meaning that it is sufficient to provide the first 5 columns as tab-separated values of a (gzipped) VCF file. All other information than CHROM, POS, REF, ALT will be ignored, as is the header (ie. any line starting with #). Files may be up to 3MB, and up to 100,000 variants can be processed per submission. Use file extension vcf, tsv, txt or tab (gzipped: vcf.gz, tsv.gz, txt.gz, tab.gz) with UTF-8/ASCII encoding.
 </p>
 
 <p>
-Alternatively, you may provide a <a href="http://cadd.gs.washington.edu/score">CADD service</a> output file. This allows you to pre-score indels (and/or SNVs) for GAVIN classification. This format is detected as [CHROM POS REF ALT RawScore PHRED], the last two being decimals, headers are ignored. You may use any CADD-output file directly in GAVIN.
+<b>Alternatively, you may directly use a <a href="http://cadd.gs.washington.edu/score">CADD service</a> output file</b>. This allows you to pre-score any variant including insertions/deletions, which GAVIN cannot do for you (it does accept any SNV using static CADD resources). This format is detected as: CHROM POS REF ALT RawScore PHRED, as tab-separated values, the last two being decimals, any headers (#..) are ignored.
 </p>
 
 <p>
-Your results will be available under an random URL that others cannot reach without knowing. Results are deleted after 24 hours and will not be accessed by the MOLGENIS team.
+Your results will be available under an random URL that others cannot reach without knowing. Result files are deleted after 24 hours and will not be accessed by the MOLGENIS team.
 </p>
 
 <p>
@@ -19,6 +19,4 @@ Example input files:<br>
 <a href="http://www.molgenis.org/downloads/gavin/variantclassificationwebtool/testfiles/gavin_simpleexamplefile_truevcf.vcf">True VCF file with many columns and header</a><br>
 <a href="http://www.molgenis.org/downloads/gavin/variantclassificationwebtool/testfiles/gavin_simpleexamplefile_fromcadd.tsv">CADD-output file with 6 columns and original header</a>
 </p>
-
-
 
