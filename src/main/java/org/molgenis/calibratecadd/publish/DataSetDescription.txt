@@ -1,0 +1,4 @@
+
+<br>Use the search box, filter wizard or data item selection on the left to change your search view.
+<br>There are currently 3,498 searchable genes, based on information from <a href="http://www.ncbi.nlm.nih.gov/clinvar/">ClinVar</a>.
+<br>For more information on how to use the contents this table, please see <a href="https://github.com/joerivandervelde/gavin/blob/master/data/predictions/GAVIN_ruleguide_r0.3.tsv">GitHub</a>.
