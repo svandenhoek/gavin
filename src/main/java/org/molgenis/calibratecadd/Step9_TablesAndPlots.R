@@ -2,7 +2,7 @@
 # Performance benchmark result processing and plotting
 ######################################################
 
-version <- "r0.2"
+version <- "r0.3"
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
 
 library(ggplot2)
@@ -97,12 +97,13 @@ rules$BenignIfCADDScoreLessThan <- as.numeric(rules$BenignIfCADDScoreLessThan)
 
 
 ## Gene plots, for single selected genes or all genes in a for-loop
-for (selectGene in unique(variants$gene)) {
+for (selectGene in unique(rules$Gene)) {
   #selectGene <- "MYH7"
   rules.selectedGene <- subset(rules, Gene == selectGene)
   if(startsWith(rules.selectedGene$CalibrationCategory, "C")) {
-    variants.selectedGene.path <- subset(variants, gene == selectGene & group == "PATHOGENIC")
-    variants.selectedGene.popul <- subset(variants, gene == selectGene & group == "POPULATION")
+    variants.selectedGene <- subset(variants, gene == selectGene)
+    variants.selectedGene.path <- subset(variants.selectedGene, group == "PATHOGENIC")
+    variants.selectedGene.popul <- subset(variants.selectedGene, group == "POPULATION")
     p <- ggplot() +
       geom_point(data = variants.selectedGene.popul, aes(x=pos, y=cadd), colour="blue", pch=19, alpha = .5) +
       geom_point(data = variants.selectedGene.path, aes(x=pos, y=cadd), colour="red", pch=19, alpha = .5) +
@@ -117,7 +118,7 @@ for (selectGene in unique(variants$gene)) {
       ) +
       labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
       ylab("CADD scaled C-score") +
-      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
+      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none")
   } else {
     p <- ggplot() +
@@ -126,12 +127,12 @@ for (selectGene in unique(variants$gene)) {
       theme(axis.line = element_line(colour = "white"), panel.grid.major = element_line(colour = "white"), panel.grid.minor = element_line(colour = "white"), panel.border = element_blank(), panel.background = element_blank()) +
       labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
       ylab("CADD scaled C-score") +
-      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(calibrations.selectedGene$Chr)),"]", sep="")) +
+      xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none") +
       xlim(0,1) + ylim(0,1)
   }
   #p
-  ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3/",selectGene,".png", sep=""), width=8, height=4.5)
+  ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3_v2/",selectGene,".png", sep=""), width=8, height=4.5)
 }
 
 ###################################################

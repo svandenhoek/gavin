@@ -20,3 +20,4 @@ Example input files:<br>
 <a href="http://www.molgenis.org/downloads/gavin/variantclassificationwebtool/testfiles/gavin_simpleexamplefile_fromcadd.tsv">CADD-output file with 6 columns and original header</a>
 </p>
 
+<hr>
