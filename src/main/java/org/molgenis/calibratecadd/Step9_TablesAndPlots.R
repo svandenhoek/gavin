@@ -2,7 +2,7 @@
 # Performance benchmark result processing and plotting
 ######################################################
 
-version <- "r0.3"
+version <- "r0.2"
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
 
 library(ggplot2)
@@ -58,7 +58,9 @@ ggplot() +
   scale_colour_manual(values=rainbow(16)) +
   scale_shape_manual(values = c(1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) +
   scale_x_continuous(lim=c(0.377,1), breaks = seq(0, 1, by = 0.1)) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
+  theme(legend.key = element_blank())
+ggsave("Figure1.pdf", width = 27.5, height = 27.5, units = "cm")
 
 ###########################################################
 # Miscellaneous numbers and plots, used in paper or website
@@ -160,7 +162,10 @@ ggplot() + annotate("text", x = 1.2:6.2, y = .75, label = rep(c("Genome-wide", "
                     breaks=c("C1_C2", "C4", "C3"),
                     labels=c("CADD predictive genes (681)", "CADD less predictive genes (732)", "Scarce training data genes (774)")) +
   scale_colour_manual(values=c("black", vermillion), name="GAVIN classification", breaks=c("GAVIN", "GAVINnocal"), labels=c("Gene-specific", "Genome-wide")) +
-  coord_flip()
+  coord_flip() +
+  guides(colour = guide_legend(override.aes = list(size = .75)), fill = guide_legend(override.aes = list(size = .5)))+
+  theme(legend.key = element_blank())
+ggsave("Figure2.pdf", width = 24.5, height = 12.25, units = "cm")
 
 # mann-whitney-wilcoxon test and median accuracy values used in paper
 calib <- subset(df, Tool == "GAVIN")
