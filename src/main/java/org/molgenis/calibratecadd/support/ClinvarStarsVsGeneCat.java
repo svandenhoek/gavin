@@ -50,6 +50,14 @@ public class ClinvarStarsVsGeneCat {
                 continue;
             }
 
+
+            // needs to contain 'pathogenic'
+            String clinsig = lineSplit[6];
+            if (!clinsig.toLowerCase().contains("pathogenic"))
+            {
+                continue;
+            }
+
             // see: ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/README
             String GeneSymbol = lineSplit[4];
             String ReviewStatus = lineSplit[24];
@@ -96,7 +104,9 @@ public class ClinvarStarsVsGeneCat {
             double NumberSubmittersMean = mean.evaluate(NumberSubmittersArr);
             double SubmitterCategoriesMean = mean.evaluate(SubmitterCategoriesArr);
 
-            System.out.println(gene + "\t" + gu.geneToEntry.get(gene).category + "\t" + gu.geneToEntry.get(gene).UTestPvalue + "\t" + genes.get(gene).size() + "\t" + ReviewStatusMean + "\t" + NumberSubmittersMean + "\t" + SubmitterCategoriesMean);
+            String pval =  gu.geneToEntry.get(gene).UTestPvalue == null ? "NA" :  gu.geneToEntry.get(gene).UTestPvalue+"";
+
+            System.out.println(gene + "\t" + gu.geneToEntry.get(gene).category + "\t" + pval + "\t" + genes.get(gene).size() + "\t" + ReviewStatusMean + "\t" + NumberSubmittersMean + "\t" + SubmitterCategoriesMean);
         }
 
 

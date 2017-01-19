@@ -10,7 +10,7 @@ yellow <- "#F0E442"; blue <-"#0072B2"; vermillion <- "#D55E00"; reddishpurple <-
 ## C3 = CADD scores may be predictive for pathogenicity (pval > 0.05 but with few samples).
 ## C4 = CADD scores less predictive for pathogenicity (pval > 0.05 with enough samples).
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
-mrd <- read.table(paste(pathToGavinGitRepo,"/data/other/meanreviewstatus.tsv",sep=""), sep="\t", header=T)
+mrd <- read.table(paste(pathToGavinGitRepo,"/data/other/meanreviewstatusPatho.tsv",sep=""), sep="\t", header=T)
 mrdSub <- subset(mrd, Category == 'C1' | Category == 'C2' | Category == 'C3' | Category == 'C4')
 
 plot(mrd$Pvalue ~ mrd$NrOfVariants)
@@ -31,11 +31,11 @@ ggplot() +
 lmfit <- lm(Pvalue ~ NrOfVariants, data=mrdSub)
 ggplot() +
   geom_point(data = mrdSub, aes(x = NrOfVariants, y = Pvalue), alpha=0.5) +
-  theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=14,face="bold")) +
+  theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
   geom_abline(intercept = lmfit$coefficients[1], slope = lmfit$coefficients[2], color="red", size=1) +
   ylab("GAVIN gene calibration p-value") +
-  xlab("Number of ClinVar variants for gene") +
-  scale_x_continuous(lim=c(0,2200)) +
+  xlab("Number of pathogenic ClinVar variants for gene") +
+  scale_x_continuous(lim=c(0,600)) +
   scale_y_continuous(lim=c(0,1))
 ggsave("NrVariantsVsPvalue.pdf", width = 12, height = 12, units = "cm")
 
@@ -43,11 +43,11 @@ ggsave("NrVariantsVsPvalue.pdf", width = 12, height = 12, units = "cm")
 lmfit <- lm(Pvalue ~ ReviewStatusMean, data=mrdSub)
 ggplot() +
   geom_point(data = mrdSub, aes(x = ReviewStatusMean, y = Pvalue), alpha=0.2) +
-  theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=14,face="bold")) +
+  theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
   geom_abline(intercept = lmfit$coefficients[1], slope = lmfit$coefficients[2], color="red", size=1) +
   scale_x_continuous(lim=c(0,3)) +
   ylab("GAVIN gene calibration p-value") +
-  xlab("Mean of variant ClinVar review status")
+  xlab("Mean of pathogenic variant ClinVar review status")
 ggsave("ReviewStatusMeanVsPvalue.pdf", width = 12, height = 12, units = "cm")
 
 
