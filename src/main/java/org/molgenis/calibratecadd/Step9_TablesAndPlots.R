@@ -60,7 +60,8 @@ ggplot() +
   scale_x_continuous(lim=c(0.377,1), breaks = seq(0, 1, by = 0.1)) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
   theme(legend.key = element_blank())
-ggsave("Figure1.pdf", width = 27.5, height = 27.5, units = "cm")
+ggsave("Figure1.pdf", width = 27.5, height = 27.5, units = "cm") #thesis: 25 x 25
+
 
 ###########################################################
 # Miscellaneous numbers and plots, used in paper or website
