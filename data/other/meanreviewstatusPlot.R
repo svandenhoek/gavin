@@ -27,12 +27,17 @@ ggplot() +
   scale_colour_gradient(low="red", high="green", limits=c(0, 0.1))
 #ggsave("NrVariantsVsReviewStatus.pdf", width = 12, height = 12, units = "cm")
 
+#prepare extra column with log10 p-values
+mrdSub$logPvalue <- mrdSub$Pvalue
+mrdSub$logPvalue[mrdSub$logPvalue == 0] <- min(mrdSub$logPvalue[mrdSub$logPvalue > 0])
+mrdSub$logPvalue <- log(mrdSub$logPvalue, base = 10)
+
 #showing: more variants means better p-value for calibration
-lmfit <- lm(Pvalue ~ NrOfVariants, data=mrdSub)
+lmfit <- lm(logPvalue ~ NrOfVariants, data=mrdSub)
 ggplot() +
   geom_point(data = mrdSub, aes(x = NrOfVariants, y = Pvalue), alpha=0.5) +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
-  geom_abline(intercept = lmfit$coefficients[1], slope = lmfit$coefficients[2], color="red", size=1) +
+  geom_line(data=mrdSub, aes(NrOfVariants, 10^predict(lmfit)), colour="red", size=1) +
   ylab("GAVIN gene calibration p-value") +
   xlab("Number of pathogenic ClinVar variants for gene") +
   scale_x_continuous(lim=c(0,600)) +
@@ -40,11 +45,11 @@ ggplot() +
 ggsave("NrVariantsVsPvalue.pdf", width = 12, height = 12, units = "cm")
 
 #showing: better review quality means better p-value for calibration
-lmfit <- lm(Pvalue ~ ReviewStatusMean, data=mrdSub)
+lmfit <- lm(logPvalue ~ ReviewStatusMean, data=mrdSub)
 ggplot() +
   geom_point(data = mrdSub, aes(x = ReviewStatusMean, y = Pvalue), alpha=0.2) +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
-  geom_abline(intercept = lmfit$coefficients[1], slope = lmfit$coefficients[2], color="red", size=1) +
+  geom_line(data=mrdSub, aes(ReviewStatusMean, 10^predict(lmfit)), colour="red", size=1) +
   scale_x_continuous(lim=c(0,3)) +
   ylab("GAVIN gene calibration p-value") +
   xlab("Mean of pathogenic variant ClinVar review status")
