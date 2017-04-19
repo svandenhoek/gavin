@@ -60,7 +60,7 @@ ggplot() +
   scale_x_continuous(lim=c(0.377,1), breaks = seq(0, 1, by = 0.1)) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
   theme(legend.key = element_blank())
-ggsave("Figure1.pdf", width = 27.5, height = 27.5, units = "cm") #thesis: 25 x 25
+ggsave("Figure1.pdf", width = 25, height = 32, units = "cm") #thesis: 25 x 32
 
 
 ###########################################################
@@ -147,7 +147,7 @@ df <- read.table(bootStrapResults,header=TRUE)
 df$Acc <- as.double(as.character(df$Acc))
 
 # Figure 2 in paper
-ggplot() + annotate("text", x = 1.2:6.2, y = .75, label = rep(c("Genome-wide", "Gene-specific"), 3)) + 
+ggplot() + 
   geom_boxplot(data = df, aes(x = Label, y = Acc, fill = Calib, colour=Tool), size=1.1) +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=14,face="bold")) +
   ylab("Accuracy") + xlab("GAVIN classification") +
@@ -165,7 +165,8 @@ ggplot() + annotate("text", x = 1.2:6.2, y = .75, label = rep(c("Genome-wide", "
   scale_colour_manual(values=c("black", vermillion), name="GAVIN classification", breaks=c("GAVIN", "GAVINnocal"), labels=c("Gene-specific", "Genome-wide")) +
   coord_flip() +
   guides(colour = guide_legend(override.aes = list(size = .75)), fill = guide_legend(override.aes = list(size = .5)))+
-  theme(legend.key = element_blank())
+  theme(legend.key = element_blank()) +
+  annotate("text", x = 1.2:6.2, y = .75, label = rep(c("Genome-wide", "Gene-specific"), 3))
 ggsave("Figure2.pdf", width = 24.5, height = 12.25, units = "cm")
 
 # mann-whitney-wilcoxon test and median accuracy values used in paper
