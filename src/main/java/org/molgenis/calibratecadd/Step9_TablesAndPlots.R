@@ -2,7 +2,7 @@
 # Performance benchmark result processing and plotting
 ######################################################
 
-version <- "r0.2"
+version <- "r0.4"
 pathToGavinGitRepo <- "/Users/joeri/github/gavin"
 
 library(ggplot2)
@@ -85,8 +85,11 @@ mean(calibrations$MeanDifference, na.rm = T)
 sd(calibrations$MeanDifference, na.rm = T)
 table(calibrations$Category)
 
+#calibrations <- read.table(paste(pathToGavinGitRepo,"/data/predictions/GAVIN_calibrations_r0.4.tsv",sep=""),header=TRUE,sep='\t',quote="",comment.char="",as.is=TRUE)
+#table(calibrations$Category)
+
 # Some plots/stats on the variants used in calibration
-variants <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/clinvar_exac_calibrationvariants_",version,".tsv.gz",sep="")), sep="\t", header=T)
+variants <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/calibrationvariants_",version,".tsv.gz",sep="")), sep="\t", header=T)
 ggplot() +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=14,face="bold")) +
   geom_jitter(data = variants, aes(x = cadd, y = effect, colour = group, alpha=group), stroke = 2, size=2, position = position_jitter(width = .5, height=.5)) +
@@ -101,7 +104,7 @@ rules$BenignIfCADDScoreLessThan <- as.numeric(rules$BenignIfCADDScoreLessThan)
 
 ## Gene plots, for single selected genes or all genes in a for-loop
 for (selectGene in unique(rules$Gene)) {
-  #selectGene <- "MYH7"
+  #selectGene <- "TTN"
   rules.selectedGene <- subset(rules, Gene == selectGene)
   if(startsWith(rules.selectedGene$CalibrationCategory, "C")) {
     variants.selectedGene <- subset(variants, gene == selectGene)
@@ -119,7 +122,7 @@ for (selectGene in unique(rules$Gene)) {
             panel.border = element_blank(),
             panel.background = element_blank()
       ) +
-      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
+      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched gnomAD variants", sep="")) +
       ylab("CADD scaled C-score") +
       xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none")
@@ -128,14 +131,14 @@ for (selectGene in unique(rules$Gene)) {
       geom_text(aes(label = paste("There is no variant CADD calibration for ", selectGene, ".\nHowever, estimated impact or allele frequency may\nbe predictive. Please consult the GAVIN rule guide.", sep=""), x = .5, y = .75)) +
       theme_bw() +
       theme(axis.line = element_line(colour = "white"), panel.grid.major = element_line(colour = "white"), panel.grid.minor = element_line(colour = "white"), panel.border = element_blank(), panel.background = element_blank()) +
-      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched ExAC variants", sep="")) +
+      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched gnomAD variants", sep="")) +
       ylab("CADD scaled C-score") +
       xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none") +
       xlim(0,1) + ylim(0,1)
   }
   #p
-  ggsave(paste("/Users/joeri/Desktop/gavin-paper/plots_r0.3_v2/",selectGene,".png", sep=""), width=8, height=4.5)
+  ggsave(paste("/Users/joeri/Desktop/gavin-r0.4/plots/",selectGene,".png", sep=""), width=8, height=4.5)
 }
 
 ###################################################
@@ -191,4 +194,42 @@ median(C3_calib$Acc)
 median(C3_uncalib$Acc)
 wilcox.test(C3_calib$Acc, C3_uncalib$Acc)
 
+### r0.3 vs r0.4 ###
+variantsv3 <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/calibrationvariants_r0.3.tsv.gz",sep="")), sep="\t", header=T)
+variantsv4 <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/calibrationvariants_r0.4.tsv.gz",sep="")), sep="\t", header=T)
+d3 <- as.data.frame(table(variantsv3$gene))
+d4 <- as.data.frame(table(variantsv4$gene))
+m <- merge(x = d3, y = d4, by.x = "Var1", by.y = "Var1")
+plot(m$Freq.x,m$Freq.y, log="yx", ylab="GAVIN r0.4", xlab="GAVIN r0.3", title("Variants used per calibrated gene"))
+abline(a = 0, b = 1, col = "red")
+m$abs <- m$Freq.y-m$Freq.x
+m$rel <- m$Freq.y/m$Freq.x
+plot(sort(m$abs))
+top50 <- head(m[order(m$abs, decreasing = TRUE),], 50)
+#write.table(top50rel, file="~/Desktop/top50rel.tsv", sep="\t")
+#genes with variants unique to d3
+lost <- d3[which(!(d3$Var1 %in% d4$Var)),]$Var1
+length(lost)
+#genes with variants  unique to d4
+gained <- d4[which(!(d4$Var1 %in% d3$Var)),]$Var1
+length(gained)
+
+### r0.3 vs r0.4 based on rule guide ### 
+rules3 <- read.table(paste(pathToGavinGitRepo,"/data/predictions/GAVIN_ruleguide_r0.3.tsv",sep=""),header=TRUE,sep='\t',quote="",comment.char="",as.is=TRUE, skip=33)
+rules4 <- read.table(paste(pathToGavinGitRepo,"/data/predictions/GAVIN_ruleguide_r0.4.tsv",sep=""),header=TRUE,sep='\t',quote="",comment.char="",as.is=TRUE, skip=33)
+dim(rules3)
+dim(rules4)
+#genes unique to release 3 (incl. no variants)
+lost <- rules3[which(!(rules3$Gene %in% rules4$Gene)),]$Gene
+length(lost)
+#genes unique to release 4 (incl. no variants)
+gained <- rules4[which(!(rules4$Gene %in% rules3$Gene)),]$Gene
+length(gained)
+
+
+## variant compare ##
+ttn3 <- variantsv3[which(variantsv3$gene=="TTN"),]
+ttn4 <- variantsv4[which(variantsv4$gene=="TTN"),]
+ttnM <- merge(x = ttn3, y = ttn4, by.x = c("chr", "pos", "ref", "alt"), by.y = c("chr", "pos", "ref", "alt"))
+plot(ttnM$cadd.x, ttnM$cadd.y)
 

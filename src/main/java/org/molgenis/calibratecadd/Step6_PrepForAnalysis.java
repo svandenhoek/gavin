@@ -87,16 +87,25 @@ public class Step6_PrepForAnalysis
 			}
 			else
 			{
-				String trimmedRefAlt = FixVcfAlleleNotation.trimRefAlt(ref, alt, "_");
-				key = chr + "_" + pos + "_" + trimmedRefAlt;
-				if(caddScores.containsKey(key))
+				String backTrimmedRefAlt = FixVcfAlleleNotation.backTrimRefAlt(ref, alt, "_");
+				String btkey = chr + "_" + pos + "_" + backTrimmedRefAlt;
+
+				String frontTrimmedRefAlt = FixVcfAlleleNotation.frontTrimRefAlt(ref, alt, "_");
+				String ftkey = chr + "_" + pos + "_" + frontTrimmedRefAlt;
+
+				if(caddScores.containsKey(btkey))
 				{
-					System.out.println("RESOLVED by trimming ref alt " + ref + "_" + alt + " to " + trimmedRefAlt);
-					pw.println(printMe.replace("/", "_") + "\t" + caddScores.get(key));
+					System.out.println("RESOLVED by back-trimming ref alt " + ref + "_" + alt + " to " + backTrimmedRefAlt);
+					pw.println(printMe.replace("/", "_") + "\t" + caddScores.get(btkey));
+				}
+				else if(caddScores.containsKey(ftkey))
+				{
+					System.out.println("RESOLVED by front-trimming ref alt " + ref + "_" + alt + " to " + frontTrimmedRefAlt);
+					pw.println(printMe.replace("/", "_") + "\t" + caddScores.get(ftkey));
 				}
 				else
 				{
-					System.out.println("WARNING: could not get CADD score for " + key);
+					System.out.println("WARNING: could not get CADD score for " + key + " using either " + backTrimmedRefAlt + " or " + frontTrimmedRefAlt);
 				}
 
 

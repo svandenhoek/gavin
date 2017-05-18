@@ -14,6 +14,11 @@ import org.molgenis.data.annotation.entity.impl.snpEff.Impact;
 
 public class Step4_Helper
 {
+
+//	static String AC_string = "AC_Adj"; //exac:
+	static String AC_string = "AC"; //gnomad
+
+
 	/**
 	 * Constructor
 	 */
@@ -56,8 +61,13 @@ public class Step4_Helper
 				}
 				altsSeenForVariant.add(alt);
 				exacVariantCopy.getKeyVal().put("ALT", alt);
-				exacVariantCopy.getKeyVal().put("AF", Double.parseDouble(exacVariant.getString("AF").split(",", -1)[altIndex]));
-				exacVariantCopy.getKeyVal().put("AC_Adj", Integer.parseInt(exacVariant.getString("AC_Adj").split(",", -1)[altIndex]));
+
+				//gnomAD check
+				String AF = exacVariant.getString("AF").split(",", -1)[altIndex];
+				if(AF.equals(".")) { continue; }
+
+				exacVariantCopy.getKeyVal().put("AF", Double.parseDouble(AF));
+				exacVariantCopy.getKeyVal().put(AC_string, Integer.parseInt(exacVariant.getString(AC_string).split(",", -1)[altIndex]));
 				Impact impact = GavinUtils.getImpact(exacVariant.getString("ANN"), gene, alt);
 				//if there is no impact we skip it, e.g. for gene 'BBS1', allele 'T' in T|intergenic_region|MODIFIER|DPP3-BBS1|DPP3-BBS1|intergenic_region|DPP3-BBS1|||n.66278118G>T||||||
 				if(impact == null){
@@ -73,7 +83,7 @@ public class Step4_Helper
 			//set original to null so we don't accidentally use it somewhere
 			exacVariant.set("ALT", null);
 			exacVariant.set("AF", null);
-			exacVariant.set("AC_Adj", null);
+			exacVariant.set(AC_string, null);
 			exacVariant.set("IMPACT", null);
 			exacVariant.set("EFFECT", null);
 
@@ -169,7 +179,7 @@ public class Step4_Helper
 		for(EntityPlus exacVariantPlus : inExACOnly)
 		{
 			double maf = Double.parseDouble(exacVariantPlus.getKeyVal().get("AF").toString());
-			int AC_Adj = Integer.parseInt(exacVariantPlus.getKeyVal().get("AC_Adj").toString());
+			int AC_Adj = Integer.parseInt(exacVariantPlus.getKeyVal().get(AC_string).toString());
 
 			//we consider each alt allele as a possible 'keep' or 'ditch'
 			//though we only keep 1 alt allele if that one is a match
