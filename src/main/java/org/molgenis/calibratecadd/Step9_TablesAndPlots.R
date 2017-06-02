@@ -103,6 +103,10 @@ rules$BenignIfCADDScoreLessThan <- as.numeric(rules$BenignIfCADDScoreLessThan)
 
 
 ## Gene plots, for single selected genes or all genes in a for-loop
+
+# refseq exons used in new style plot
+refeqExons <- read.table(gzfile(paste(pathToGavinGitRepo,"/data/other/refseq-exons-list.tsv.gz", sep="")), sep="\t", header=T)
+
 for (selectGene in unique(rules$Gene)) {
   #selectGene <- "TTN"
   rules.selectedGene <- subset(rules, Gene == selectGene)
@@ -110,19 +114,34 @@ for (selectGene in unique(rules$Gene)) {
     variants.selectedGene <- subset(variants, gene == selectGene)
     variants.selectedGene.path <- subset(variants.selectedGene, group == "PATHOGENIC")
     variants.selectedGene.popul <- subset(variants.selectedGene, group == "POPULATION")
+    refeqExonsGene <- subset(refeqExons, gene == selectGene)
+    if(dim(refeqExonsGene)[[1]]==0){ refeqExonsGene <- data.frame(gene=selectGene,start=-1,end=-1) }
+    xmin <- min(variants.selectedGene.popul$pos, variants.selectedGene.path$pos)
+    xmax <- max(variants.selectedGene.popul$pos, variants.selectedGene.path$pos)
+    ymax <- max(variants.selectedGene.popul$cadd, variants.selectedGene.path$cadd)
+    pth <- rules.selectedGene$PathogenicIfCADDScoreGreaterThan
+    bth <-rules.selectedGene$BenignIfCADDScoreLessThan
     p <- ggplot() +
-      geom_point(data = variants.selectedGene.popul, aes(x=pos, y=cadd), colour="blue", pch=19, alpha = .5) +
-      geom_point(data = variants.selectedGene.path, aes(x=pos, y=cadd), colour="red", pch=19, alpha = .5) +
-      geom_abline(intercept = rules.selectedGene$BenignIfCADDScoreLessThan, slope = 0, colour = "blue", size = 2, alpha = .5) +
-      geom_abline(intercept = rules.selectedGene$PathogenicIfCADDScoreGreaterThan, slope = 0, colour = "red", size = 2, alpha = .5) +
+      xlim(xmin,xmax) +
+      geom_rect(aes(xmin = -Inf, xmax = +Inf, ymin = 15, ymax = ymax), fill = "#FFE0E1", alpha = 1) + # lighter red
+      geom_rect(aes(xmin = -Inf, xmax = +Inf, ymin = 0, ymax = 15), fill = "#DFE2FD", alpha = 1) + # lighter blue
+      geom_rect(aes(xmin = -Inf, xmax = +Inf, ymin = 0, ymax =  bth), fill = "#C9CEFC", alpha = 1) + # blue
+      geom_rect(aes(xmin = -Inf, xmax = +Inf, ymin = pth, ymax = ymax), fill = "#FFCACC", alpha = 1) + # red
+      geom_abline(intercept = 15, slope = 0, colour = "darkgrey", size = 2, alpha = 1) +
+      geom_abline(intercept = bth, slope = 0, colour = "#6681F7", size = 2, alpha = 1) + # dark blue
+      geom_abline(intercept = pth, slope = 0, colour = "#FF6E77", size = 2, alpha = 1) + # dark red
+      geom_rect(data = refeqExonsGene, aes(xmin = start, xmax = end, ymin = 0, ymax = ymax), linetype = 0, fill="green3", alpha = 1) +
+      geom_point(data = variants.selectedGene.popul, aes(x=pos, y=cadd), colour="blue", pch=19, alpha = 1) +
+      geom_point(data = variants.selectedGene.path, aes(x=pos, y=cadd), colour="red", pch=19, alpha = 1) +
       theme_bw() +
       theme(axis.line = element_line(colour = "black"),
-            panel.grid.major = element_line(colour = "black"),
-            panel.grid.minor = element_line(colour = "gray"),
+            panel.grid.major.y = element_line(colour = "black"),
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor = element_blank(),
             panel.border = element_blank(),
             panel.background = element_blank()
       ) +
-      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched gnomAD variants", sep="")) +
+      labs(title=paste("GAVIN ", version, ". Thresholds for ", selectGene, ": pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nred: ClinVar pathogenic variants, blue: rarity & impact matched gnomAD\nvariants, green: RefSeq exons, grey: genome-wide fallback threshold", sep="")) +
       ylab("CADD scaled C-score") +
       xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none")
@@ -130,8 +149,12 @@ for (selectGene in unique(rules$Gene)) {
     p <- ggplot() +
       geom_text(aes(label = paste("There is no variant CADD calibration for ", selectGene, ".\nHowever, estimated impact or allele frequency may\nbe predictive. Please consult the GAVIN rule guide.", sep=""), x = .5, y = .75)) +
       theme_bw() +
-      theme(axis.line = element_line(colour = "white"), panel.grid.major = element_line(colour = "white"), panel.grid.minor = element_line(colour = "white"), panel.border = element_blank(), panel.background = element_blank()) +
-      labs(title=paste(selectGene, " thresholds: pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nRed: ClinVar pathogenic variants - Blue: matched gnomAD variants", sep="")) +
+      theme(axis.line = element_line(colour = "black"),
+            panel.grid = element_blank(),
+            panel.border = element_blank(),
+            panel.background = element_blank()
+      ) + 
+      labs(title=paste("GAVIN ", version, ". Thresholds for ", selectGene, ": pathogenic > ", rules.selectedGene$PathogenicIfCADDScoreGreaterThan, ", benign < ", rules.selectedGene$BenignIfCADDScoreLessThan, "\nMAF benign > ",rules.selectedGene$BenignIfMAFGreaterThan,", cat: ",rules.selectedGene$CalibrationCategory,"\nred: ClinVar pathogenic variants, blue: rarity & impact matched gnomAD\nvariants, green: RefSeq exons, grey: genome-wide fallback threshold", sep="")) +
       ylab("CADD scaled C-score") +
       xlab(paste("Genomic position [",selectGene,", chr. ",sort(unique(variants.selectedGene$chr)),"]", sep="")) +
       theme(legend.position = "none") +
@@ -225,7 +248,7 @@ length(lost)
 #genes unique to release 4 (incl. no variants)
 gained <- rules4[which(!(rules4$Gene %in% rules3$Gene)),]$Gene
 length(gained)
-
+gainedInterestingGenes <- subset(rules4[which(rules4$Gene %in% gained),], CalibrationCategory == "C1")
 
 ## variant compare ##
 ttn3 <- variantsv3[which(variantsv3$gene=="TTN"),]
@@ -233,3 +256,36 @@ ttn4 <- variantsv4[which(variantsv4$gene=="TTN"),]
 ttnM <- merge(x = ttn3, y = ttn4, by.x = c("chr", "pos", "ref", "alt"), by.y = c("chr", "pos", "ref", "alt"))
 plot(ttnM$cadd.x, ttnM$cadd.y)
 
+## which in rules but not in refseq?
+notinrefseq <- rules4[which(!(rules4$Gene %in% refeqExons$gene)),]$Gene
+## which in variants but not in refseq?
+notinrefseq <- d3[which(!(d3$Var1 %in% refeqExons$gene)),]$Var1
+
+#do C-cat genes match genes with variants ?
+Cgenes <- rules4[which(startsWith(rules4$CalibrationCategory, "C")),]
+dim(Cgenes)[[1]]==dim(d4)[[1]]
+# artifacts?
+Agenes <- rules4[which(rules4$CalibrationCategory=="C5"),]
+
+
+## trackview?
+source("https://bioconductor.org/biocLite.R")
+biocLite("trackViewer")
+biocLite("TxDb.Hsapiens.UCSC.hg19.knownGene")
+biocLite("org.Hs.eg.db")
+library(trackViewer)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(org.Hs.eg.db)
+
+gr <- GRanges("chr11", IRanges(122929275, 122930122), strand="-")
+trs <- geneModelFromTxdb(TxDb.Hsapiens.UCSC.hg19.knownGene,
+                         org.Hs.eg.db,
+                         gr=gr)
+viewerStyle <- trackViewerStyle()
+setTrackViewerStyleParam(viewerStyle, "margin", c(.1, .05, .02, .02))
+vp <- viewTracks(trackList(trs), 
+                 gr=gr, viewerStyle=viewerStyle, 
+                 autoOptimizeStyle=TRUE)
+
+dtTrack <- DataTrack(start=seq(1,1000, len=100), width=10, data=dat,
+                     chromosome=1, genome="mm9", name="random data")
