@@ -28,20 +28,22 @@ ggplot() +
 #ggsave("NrVariantsVsReviewStatus.pdf", width = 12, height = 12, units = "cm")
 
 #prepare extra column with log10 p-values
-mrdSub$logPvalue <- mrdSub$Pvalue
-mrdSub$logPvalue[mrdSub$logPvalue == 0] <- min(mrdSub$logPvalue[mrdSub$logPvalue > 0])
-mrdSub$logPvalue <- log(mrdSub$logPvalue, base = 10)
+mrdSub$logNrOfVariants <- mrdSub$NrOfVariants
+mrdSub$logNrOfVariants[mrdSub$logNrOfVariants == 0] <- min(mrdSub$logNrOfVariants[mrdSub$logNrOfVariants > 0])
+mrdSub$logNrOfVariants <- log(mrdSub$logNrOfVariants, base = 10)
 
 #showing: more variants means better p-value for calibration
-lmfit <- lm(logPvalue ~ NrOfVariants, data=mrdSub)
+lmfit <- lm(logNrOfVariants ~ Pvalue, data=mrdSub)
+summary(lmfit)$r.squared
+summary(lmfit)$coefficients[,4]
 ggplot() +
-  geom_point(data = mrdSub, aes(x = NrOfVariants, y = Pvalue), alpha=0.5) +
+  geom_point(data = mrdSub, aes(y = NrOfVariants, x = Pvalue), alpha=0.5) +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
-  geom_line(data=mrdSub, aes(NrOfVariants, 10^predict(lmfit)), colour="red", size=1) +
-  ylab("GAVIN gene calibration p-value") +
-  xlab("Number of pathogenic ClinVar variants for gene") +
-  scale_x_continuous(lim=c(0,600)) +
-  scale_y_continuous(lim=c(0,1))
+  geom_line(data=mrdSub, aes(x = Pvalue, y = 10^predict(lmfit)), colour="red", size=1) +
+  xlab("GAVIN gene calibration p-value") +
+  ylab("Number of pathogenic ClinVar variants for gene") +
+  scale_y_continuous(lim=c(0,600)) +
+  scale_x_continuous(lim=c(0,1))
 ggsave("NrVariantsVsPvalue.pdf", width = 12, height = 12, units = "cm")
 
 #showing: better review quality means better p-value for calibration
