@@ -46,8 +46,15 @@ ggplot() +
   scale_x_continuous(lim=c(0,1))
 ggsave("NrVariantsVsPvalue.pdf", width = 12, height = 12, units = "cm")
 
+#prepare extra column with log10 p-values
+mrdSub$logPvalue <- mrdSub$Pvalue
+mrdSub$logPvalue[mrdSub$logPvalue == 0] <- min(mrdSub$logPvalue[mrdSub$logPvalue > 0])
+mrdSub$logPvalue <- log(mrdSub$logPvalue, base = 10)
+
 #showing: better review quality means better p-value for calibration
 lmfit <- lm(logPvalue ~ ReviewStatusMean, data=mrdSub)
+summary(lmfit)$r.squared
+summary(lmfit)$coefficients[,4]
 ggplot() +
   geom_point(data = mrdSub, aes(x = ReviewStatusMean, y = Pvalue), alpha=0.2) +
   theme_bw() + theme(panel.grid.major = element_line(colour = "black"), axis.text=element_text(size=12),  axis.title=element_text(size=12,face="bold")) +
